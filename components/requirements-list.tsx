@@ -12,7 +12,7 @@ export default function RequirementsList() {
       title: t("photoSize"),
       items: ["requirements.size1", "requirements.size2"],
       color: "from-cyan-400 via-blue-500 to-indigo-600",
-      icon: "📏",
+      icon: "📏📏📏",
     },
     {
       title: t("headPosition"),
