@@ -18,7 +18,7 @@ export default function RequirementsList() {
       title: t("headPosition"),
       items: ["requirements.position1", "requirements.position2"],
       color: "from-emerald-400 via-teal-500 to-cyan-600",
-      icon: "👤",
+      icon: "👤👤👤👤👤",
     },
     {
       title: t("backgroundAndPose"),
