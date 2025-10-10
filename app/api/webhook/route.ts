@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server"
-import { stripe } from "@/lib/stripe"
+import { stripe, isStripeConfigured } from "@/lib/stripe"
 import type Stripe from "stripe"
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
 export async function POST(req: Request) {
   try {
+    // 检查 Stripe 是否已配置
+    if (!isStripeConfigured || !stripe) {
+      return NextResponse.json({ error: "Payment system is not configured" }, { status: 503 })
+    }
+
     const body = await req.text()
     const signature = req.headers.get("stripe-signature")
 

@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server"
-import { stripe } from "@/lib/stripe"
+import { stripe, isStripeConfigured } from "@/lib/stripe"
 
 export async function POST(req: Request) {
   try {
+    // 检查 Stripe 是否已配置
+    if (!isStripeConfigured || !stripe) {
+      return NextResponse.json(
+        { error: "Payment system is not configured. Please set up Stripe environment variables." },
+        { status: 503 },
+      )
+    }
+
     const { priceId, plan } = await req.json()
 
     if (!priceId) {

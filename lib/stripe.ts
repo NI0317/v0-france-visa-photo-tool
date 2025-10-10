@@ -1,13 +1,18 @@
 import Stripe from "stripe"
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not set")
+// 检查是否配置了 Stripe 密钥
+const isStripeConfigured = !!process.env.STRIPE_SECRET_KEY
+
+let stripe: Stripe | null = null
+
+if (isStripeConfigured) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2024-11-20.acacia",
+    typescript: true,
+  })
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-11-20.acacia",
-  typescript: true,
-})
+export { stripe, isStripeConfigured }
 
 export const PRICING_PLANS = {
   free: {
@@ -18,7 +23,7 @@ export const PRICING_PLANS = {
   pro: {
     name: "Pro",
     price: 4.99,
-    priceId: process.env.STRIPE_PRO_PRICE_ID || "",
+    priceId: process.env.STRIPE_PRO_PRICE_ID || "price_xxx",
     features: [
       "Unlimited photo cropping",
       "High resolution output",
@@ -30,7 +35,7 @@ export const PRICING_PLANS = {
   premium: {
     name: "Premium",
     price: 9.99,
-    priceId: process.env.STRIPE_PREMIUM_PRICE_ID || "",
+    priceId: process.env.STRIPE_PREMIUM_PRICE_ID || "price_xxx",
     features: [
       "Everything in Pro",
       "AI background removal",

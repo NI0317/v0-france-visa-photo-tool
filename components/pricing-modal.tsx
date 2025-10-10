@@ -11,20 +11,20 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check, Crown, Sparkles, Zap } from "lucide-react"
+import { Check, Crown, Sparkles, Zap, AlertCircle } from "lucide-react"
 import { PRICING_PLANS } from "@/lib/stripe"
-import { loadStripe } from "@stripe/stripe-js"
 import { useLanguage } from "@/contexts/language-context"
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "")
 
 export default function PricingModal() {
   const [loading, setLoading] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const { t } = useLanguage()
 
   const handleCheckout = async (priceId: string, plan: string) => {
     try {
       setLoading(plan)
+      setError(null)
+
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: {
@@ -33,13 +33,18 @@ export default function PricingModal() {
         body: JSON.stringify({ priceId, plan }),
       })
 
-      const { url } = await response.json()
+      const data = await response.json()
 
-      if (url) {
-        window.location.href = url
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create checkout session")
+      }
+
+      if (data.url) {
+        window.location.href = data.url
       }
     } catch (error) {
       console.error("Error:", error)
+      setError(error instanceof Error ? error.message : "An error occurred")
     } finally {
       setLoading(null)
     }
@@ -77,6 +82,16 @@ export default function PricingModal() {
             Choose the perfect plan for your needs and unlock premium features
           </DialogDescription>
         </DialogHeader>
+
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+            <div>
+              <p className="text-red-800 font-semibold">Payment System Unavailable</p>
+              <p className="text-red-600 text-sm mt-1">{error}</p>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           {plans.map(({ key, icon: Icon, color, popular }) => {
@@ -123,7 +138,7 @@ export default function PricingModal() {
                   <Button
                     onClick={() => handleCheckout(plan.priceId, key)}
                     disabled={loading === key}
-                    className={`w-full bg-gradient-to-r ${color} hover:opacity-90 text-white py-6 rounded-xl shadow-lg text-lg font-bold transition-all duration-300 hover:scale-105`}
+                    className={`w-full bg-gradient-to-r ${color} hover:opacity-90 text-white py-6 rounded-xl shadow-lg text-lg font-bold transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {loading === key ? "Processing..." : `Get ${plan.name}`}
                   </Button>
@@ -146,6 +161,13 @@ export default function PricingModal() {
               </p>
             </div>
           </div>
+        </div>
+
+        <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <p className="text-amber-800 text-sm">
+            <span className="font-semibold">Note:</span> To enable payments, please configure your Stripe API keys in
+            the environment variables.
+          </p>
         </div>
       </DialogContent>
     </Dialog>
