@@ -68,10 +68,7 @@ export default function PricingModal() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 font-bold">
-          <Sparkles className="h-5 w-5" />
-          ABCCCCDDD
-        </Button>
+        
       </DialogTrigger>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-white to-violet-50">
         <DialogHeader>
